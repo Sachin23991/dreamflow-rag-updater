@@ -1,0 +1,43 @@
+name: Daily RAG Update
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # runs daily at midnight
+  workflow_dispatch:      # also can run manually
+
+jobs:
+  update-rag:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        pip install sentence-transformers faiss-cpu pandas huggingface_hub
+
+    - name: Download latest train.jsonl from HF dataset
+      run: |
+        wget -O train.jsonl "https://huggingface.co/datasets/Sachin21112004/DreamFlow-AI-Data/resolve/main/train.jsonl"
+
+    - name: Run RAG update script
+      run: python rag_update.py
+
+    - name: Upload rag_storage to HuggingFace model repo
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        python - << 'EOF'
+from huggingface_hub import HfApi
+import os
+
+api = HfApi()
+api.upload_folder(
+    repo_id="Sachin21112004/carrerflow-ai",
+    folder_path="rag_storage",
+    path_in_repo="rag_storage",
+    token=os.environ["HF_TOKEN"],
+    commit_message="Daily updated RAG knowledge"
+)
+EOF
