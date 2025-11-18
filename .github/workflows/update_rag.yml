@@ -1,55 +1,33 @@
-name: Daily RAG Update 🤖
+name: Daily RAG Update
+
 on:
-  # Runs daily at 23:40 UTC
   schedule:
-    - cron: "40 23 * * *"
-  # Allows manual triggering from the GitHub UI
+    - cron: "40 23 * * *"   # daily at 23:40 UTC
   workflow_dispatch:
 
 jobs:
   update-rag:
-    # Use the latest Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📝 Checkout repo
-        # Checks out your repository code so the workflow can access it
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: ⚙️ Install dependencies
+      - name: Install dependencies
         run: |
-          # Upgrade pip and install required libraries
           python -m pip install --upgrade pip
           pip install sentence-transformers faiss-cpu pandas huggingface_hub
 
-      - name: ⬇️ Download latest train.jsonl from HF dataset
+      - name: Download latest train.jsonl
         run: |
-          # Use wget to download the latest data file
           wget -O train.jsonl "https://huggingface.co/datasets/Sachin21112004/DreamFlow-AI-Data/resolve/main/train.jsonl"
 
-      - name: 🚀 Run RAG update script
+      - name: Run RAG update script
         run: |
-          # Executes your local script to process data and create/update rag_storage
           python rag_update.py
 
-      - name: ⬆️ Upload rag_storage to Hugging Face model repo
-        # Set the environment variable for the secret token
+      - name: Upload RAG to HuggingFace model repo
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        # FIX: The entire script is enclosed in single quotes to resolve the YAML syntax error.
-        run: 'python - <<''PY''
-from huggingface_hub import HfApi
-import os
-
-api = HfApi()
-
-api.upload_folder(
-    repo_id="Sachin21112004/carrerflow-ai",
-    folder_path="rag_storage",
-    path_in_repo="rag_storage",
-    token=os.environ["HF_TOKEN"],
-    commit_message="Daily updated RAG knowledge"
-)
-
-print("✔ Upload complete")
-'
+        run: |
+          python upload_to_hf.py
