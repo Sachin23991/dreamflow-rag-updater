@@ -36,9 +36,8 @@ jobs:
         # Set the environment variable for the secret token
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          # Python script to upload the updated 'rag_storage' folder
-          python - <<'PY'
+        # FIX: The entire script is enclosed in single quotes to resolve the YAML syntax error.
+        run: 'python - <<''PY''
 from huggingface_hub import HfApi
 import os
 
@@ -53,4 +52,4 @@ api.upload_folder(
 )
 
 print("✔ Upload complete")
-PY
+PY'
