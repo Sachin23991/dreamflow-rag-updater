@@ -11,7 +11,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-      uses: actions/checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -20,7 +25,8 @@ jobs:
 
       - name: Download latest train.jsonl from HuggingFace
         run: |
-          wget -O train.jsonl "https://huggingface.co/datasets/Sachin21112004/DreamFlow-AI-Data/resolve/main/train.jsonl"
+          wget -q -O train.jsonl "https://huggingface.co/datasets/Sachin21112004/DreamFlow-AI-Data/resolve/main/train.jsonl"
+        # if your repo is private you can use curl with HF_TOKEN, see notes below
 
       - name: Run RAG update script (build embeddings)
         run: |
