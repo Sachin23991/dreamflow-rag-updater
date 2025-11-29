@@ -52,8 +52,8 @@ def main():
                 path_in_repo=path_in_repo,
                 repo_id=HF_REPO,
                 repo_type="model",
-                token=HF_TOKEN,
-                max_retries=3
+                token=HF_TOKEN
+               
             )
             print("[HF-UPLOAD] Uploaded", p.name)
             time.sleep(0.5)
