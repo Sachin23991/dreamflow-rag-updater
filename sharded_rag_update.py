@@ -63,7 +63,7 @@ def download_manifest_and_shards_from_hf():
     try:
         manifest_file = hf_hub_download(
             repo_id=HF_REPO,
-            filename="rag_storage/manifest.json",
+            filename="manifest.json",
             local_dir=str(RAG_DIR),
             token=HF_TOKEN,
             local_dir_use_symlinks=False
