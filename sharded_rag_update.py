@@ -87,7 +87,7 @@ def download_manifest_and_shards_from_hf():
                 try:
                     hf_hub_download(
                         repo_id=HF_REPO,
-                        filename=f"rag_storage/{fname}",
+                        filename=f"{fname}",
                         local_dir=str(RAG_DIR),
                         token=HF_TOKEN,
                         local_dir_use_symlinks=False
