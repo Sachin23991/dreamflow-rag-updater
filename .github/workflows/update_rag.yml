@@ -1,49 +1,48 @@
-name: Hourly Sharded RAG Update
+name: Hourly RAG Update Pipeline
 
 on:
   schedule:
-    - cron: "15 * * * *"
-  workflow_dispatch:
+    - cron: "0 * * * *"   # Runs every hour
+  workflow_dispatch:     # Allows manual trigger
 
 jobs:
-  update-rag:
+  rag-update:
     runs-on: ubuntu-latest
-    env:
-      HF_REPO: Sachin21112004/carrerflow-ai
-      HF_DATASET: Sachin21112004/DreamFlow-AI-Data
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
     steps:
-      - name: Checkout Repo
+      # ✅ Step 1: Checkout GitHub Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      # ✅ Step 2: Setup Python
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      # ✅ Step 3: Install Dependencies
+      - name: Install Python Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade huggingface_hub
-          pip install sentence-transformers faiss-cpu numpy tqdm
+          pip install --upgrade pip
+          pip install requests huggingface_hub
 
-      - name: Download latest train.jsonl
+      # ✅ Step 4: Set Hugging Face Token (Secret)
+      - name: Set Hugging Face Auth
         run: |
-          wget -q -O train.jsonl "https://huggingface.co/datasets/${{ env.HF_DATASET }}/resolve/main/train.jsonl"
-          echo "Downloaded train.jsonl size:"
-          ls -lh train.jsonl
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Run Sharded RAG Update
+      # ✅ Step 5: Run Your Complete Pipeline
+      - name: Run RAG Update Pipeline
         env:
-          HF_REPO: ${{ env.HF_REPO }}
-          HF_TOKEN: ${{ env.HF_TOKEN }}
+          HUGGINGFACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python sharded_rag_update.py
+          python main.py
 
-      - name: Upload Shards to HuggingFace
-        env:
-          HF_REPO: ${{ env.HF_REPO }}
-          HF_TOKEN: ${{ env.HF_TOKEN }}
+      # ✅ Step 6: Commit & Push for GitHub Contributions
+      - name: Auto Commit & Push
         run: |
-          python sharded_upload_to_hf.py
+          git config --global user.name "Sachin23991"
+          git config --global user.email "sachinraosahab7@gmail.com"
+          git add .
+          git commit -m "Hourly RAG Update - $(date -u)"
+          git push || echo "No changes to commit"
