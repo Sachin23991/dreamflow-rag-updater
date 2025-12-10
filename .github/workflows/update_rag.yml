@@ -5,14 +5,20 @@ on:
     - cron: "0 * * * *"   # Runs every hour
   workflow_dispatch:     # Allows manual trigger
 
+# ✅ REQUIRED: Grant write permission so GitHub Actions can push
+permissions:
+  contents: write
+
 jobs:
   rag-update:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Checkout GitHub Repo
+      # ✅ Step 1: Checkout GitHub Repo with Auth
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ✅ Step 2: Setup Python
       - name: Setup Python Environment
@@ -38,11 +44,18 @@ jobs:
         run: |
           python main.py
 
-      # ✅ Step 6: Commit & Push for GitHub Contributions
+      # ✅ Step 6: Auto Commit & Push (Safe & Error-Free)
       - name: Auto Commit & Push
         run: |
           git config --global user.name "Sachin23991"
           git config --global user.email "sachinraosahab7@gmail.com"
+
+          git status
           git add .
-          git commit -m "Hourly RAG Update - $(date -u)"
-          git push || echo "No changes to commit"
+
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit"
+          else
+            git commit -m "Hourly RAG Update - $(date -u)"
+            git push
+          fi
