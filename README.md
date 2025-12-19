@@ -224,31 +224,6 @@ python main.py --verbose
 - **Deduplication**: Duplicate Q&A is automatically filtered
 - **Incremental Growth**: Only new data is processed each run
 
-## Troubleshooting
-
-### Pipeline Fails at Scraping Step
-
-```bash
-# Test scraper directly
-python -c "from stackoverflow_scraper import fetch_stackoverflow_qa; print(fetch_stackoverflow_qa())"
-```
-
-### RAG Build Fails
-
-```bash
-# Check train.jsonl exists
-ls -lah train.jsonl
-
-# Inspect first few samples
-head -5 train.jsonl
-```
-
-### Hugging Face Upload Issues
-
-```bash
-# Test upload manually
-python -c "from hf_rag_uploader import test_upload; test_upload()"
-```
 
 ## Contributing
 
