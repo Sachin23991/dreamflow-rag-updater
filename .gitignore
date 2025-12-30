@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# RAG outputs (must never be committed)
+rag/*.jsonl
+
+# Secrets
+.env
+*.env
